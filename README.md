@@ -2,8 +2,8 @@
 ===================
 
 ##Co potřebujete?
-1) Shopify e-shop.
-2) [Nainstalovaný plugin order printer](https://apps.shopify.com/order-printer)
+1. Shopify e-shop.
+2. [Nainstalovaný plugin order printer](https://apps.shopify.com/order-printer)
 
 ##Použití
 1. Vytvořte novou šablonu v pluginu order printer.
