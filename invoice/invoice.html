@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style>
+.box-modal{margin-top:50px;width:800px;min-height:600px;display:block;z-index:999999999;position:absolute;top:0;left:50%;margin-left:-430px;background-color:#fff;border:1px solid rgba(0,0,0,.5);padding:20px 30px}.bcg-modal{content:"";position:fixed;width:100%;height:100%;top:0;left:0;right:0;bottom:0;background-color:rgba(255,255,255,.8);z-index:99999}.close-modal{position:absolute;right:20px;top:20px;font-size:17px;font-weight:700;color:rgba(0,0,0,.5);cursor:pointer}.btn{padding:0 20px;outline:0}.btn-primary,.btn-primary:active,.btn-primary:focus,.btn-primary:hover{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13px!important;border:1px solid #2f82b4!important;color:#fff;padding:0 9px!important}.btn-primary{background-color:#479ccf!important}.btn-primary:active,.btn-primary:focus,.btn-primary:hover{background-color:#2a74a0!important}.btn:disabled{opacity:.4}.hidden{visibility:hidden;height:0;width:0;opacity:0}.visibile{visibility:visible;height:auto;width:auto;opacity:1}.printer-preview-top{min-height:38px}.heading.printer-template-name{float:left;line-height:34px;font-size:15px}.printer-template-actions button{float:right}
+</style>
+</head>
+<body>
+
+<div class="printer-template-actions">
+
+<div id="modal" class="hidden">
+  <div class="box-modal">
+    <span id="close-modal" class="close-modal">X</span>
+    <h3>Chci vystavit</h3>
+    <button class="btn" id="whole-invoice">Celý dobropis</button>
+    <button class="btn" id="partial-invoice">Částečný dobropis</button>
+    <div id="modal-items" class="hidden">
+      <h3>Vyberte stornované zboží</h3>
+      <table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+        <thead>
+          <tr>
+            <th align="left" style="text-align: left">Množství</th>
+            <th>Označení dodávky</th>
+
+            <th align="right" style="width: 95px; text-align: right">Cena bez DPH</th>
+            <th align="right" style="text-align: right">%DPH</th>
+            <th align="right" style="text-align: right">DPH</th>
+            <th align="right" style="text-align: right">Celkem</th>
+            <th align="right" style="text-align: right">Stornováno?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for line_item in line_items %}
+            <tr class="produkt" data-price="{{ line_item.price }}" data-quantity="{{ line_item.quantity }}">
+              <td>{{ line_item.quantity }} x</td>
+              <td><b>{{ line_item.title }}</b></td>
+             <td align="right" style="text-align: right">
+                <span class="result-span produktBezDph"></span>
+              </td>
+              <td align="right" style="text-align: right">
+                <span class="produktDph"></span>
+              </td>
+              <td align="right" style="text-align: right">
+                <span class="result-span produktPouzeDph"></span>
+              </td>
+              <td align="right" style="text-align: right">
+                <span class="result-span produktCelkem"></span>
+              </td>
+              <td align="right" style="text-align: right">
+                 <input class="cbox" type="checkbox" name="refund" value="test">
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button class="btn btn-primary" id="modalSubmit">Vyhodnotit</button>
+    </div>
+  </div>
+  <div class="bcg-modal"></div>
+</div>
+
+<div class="faktura">
+ <div style="float: left; margin: 0 0 1.5em 0; width: 100%;">
+  <strong id="opravna-faktura" style="font-size: 1.5em;">Faktura {{ order_number }} </strong><br><br>
+  <div style="float: left; width: 45%;">
+    Dodavatel: <br>
+    <strong style="font-size: 2em;">{{ shop_name }}</strong><br><br>
+    {{ shop.address }}<br>
+    {{ shop.city }} {{ shop.province_code }} {{ shop.zip | upcase }}<br>
+    {{ shop.country }}}<br>
+    <br><br>
+    IČO: [[ XXX ]]
+    DIČ: [[ XXX ]] <br>
+    <p style="font-size: 11px">ZAPSÁNO U MĚSTSKÉHO SOUDU V [[ XXX ]].</p><br>
+    E-mail: {{ shop.email }}<br>
+    Web: {{ shop.domain }}<br><br>
+    <b>Číslo účtu: [[ XXX ]]</b><br> <br>
+
+    Forma úhrady: {{ gateway }} <br>
+    Variabilní symbol: {{ order_number }}<br><br>
+    <span style="font-size: 80%">
+    Datum vystavení: {{ created_at | date: "%d. %m. %y" }}<br>
+    Datum splatnosti: {{ date | date: "%d. %m. %y" }}<br>
+    {% for transaction in transactions limit:1 %}
+        Datum zdanitelného plnění: {{ transaction.date | date: "%d. %m. %y" }} <br>
+    {% endfor %}
+    </span>
+  </div>
+  <div style="float: right; width: 45%">
+      <h3 style="margin: 0 0 1em 0;">Odběratel:</h3>
+      <div style="margin: 0 0 1em 0; padding: 1em; border: 1px solid black;">
+        <strong>{{ billing_address.name }}</strong><br>
+        {% if billing_address.company %}
+          {{ billing_address.company }}<br>
+        {% endif %}
+        {{ billing_address.street }}<br>
+        {{ billing_address.city }}
+        {{ billing_address.province_code }}
+        {{ billing_address.zip | upcase }}<br>
+        {{ billing_address.country }}
+      </div>
+  </div>
+ </div>
+
+  <hr>
+
+  <table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+    <thead>
+      <tr>
+        <th align="left" style="text-align: left">Množství</th>
+        <th>Označení dodávky</th>
+
+        <th align="right" style="width: 95px; text-align: right">Cena bez DPH</th>
+        <th align="right" style="text-align: right">%DPH</th>
+        <th align="right" style="text-align: right">DPH</th>
+        <th align="right" style="text-align: right">Celkem</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line_item in line_items %}
+        <tr class="produkt" data-price="{{ line_item.price }}" data-quantity="{{ line_item.quantity }}">
+          <td>{{ line_item.quantity }} x</td>
+          <td><b>{{ line_item.title }}</b></td>
+          <td align="right" style="text-align: right">
+            <span class="result-span produktBezDph"></span>
+          </td>
+          <td align="right" style="text-align: right">
+            <span class="produktDph"></span>
+          </td>
+          <td align="right" style="text-align: right">
+            <span class="result-span produktPouzeDph"></span>
+          </td>
+          <td align="right" style="text-align: right">
+            <span class="result-span produktCelkem"></span>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4 style="margin: 0 0 1em 0;">Detaily k platbě</h4>
+
+  <table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+    <tr>
+      <td>Mezisoučet:</td>
+      <td align="right" style="text-align: right"><span class="result-span subtotal-price-with-decimals"></span></td>
+    </tr>
+    {% for discount in discounts %}
+    <tr>
+      <td>Sleva "{{ discount.code }}"</td>
+      <td align="right" style="text-align: right"><span class="result-span discount-price-with-decimals"></span>{{ discount.savings | money }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td>DPH:</td>
+      <td align="right" style="text-align: right"><span class="result-span tax-price-with-decimals"> </span></td>
+    </tr>
+    {% if shipping_address %}
+    <tr>
+      <td>Doprava:</td>
+      <td align="right" style="text-align: right"><span class="result-span shipping-price-with-decimals"></span></td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td>Zaokrouhlení:</td>
+      <td align="right" style="text-align: right">
+          <span class="result-span halirove-vyrovnani"></span>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>CELKEM K ÚHRADĚ:</strong></td>
+      <td align="right" style="text-align: right"><strong><span class="result-span total-price-with-decimals">{{ total_price | money }}</span></strong></td>
+    </tr>
+  </table>
+
+  <p style="font-size: 10px">V případě nejasností nebo dotazů nám pošlete email na <u>{{ shop.email }}</u></p>
+</div>
+
+</div>
+
+
+<script type="text/javascript">
+var ShopifyCustomInvoice = (function(){
+'use strict';
+ var defaults = {
+  dph: 21,
+  mena: "Kč"
+ };
+
+ var calc = {
+  produktBezDph: function(price) { return price + " " + defaults['mena']; },
+  produktPouzeDph: function(price) {return Math.round( (price * defaults['dph'] / 100 ))},
+  produktCelkem: function(price, quantity) { return Math.round( (price * defaults['dph'] / 100 ) + price )  + " " + defaults['mena'] },
+}
+
+ var init = function() {
+  calculateProducts();
+ }
+
+ var calculateProducts = function() {
+  [].forEach.call(document.querySelectorAll('.produkt'), function(el,i,a) {
+    var price = el.getAttribute('data-price'),
+        quantity = el.getAttribute('data-quantity');
+
+    el.querySelector('.produktBezDph').innerText = calc.produktBezDph(price);
+    el.querySelector('.produktDph').innerText = defaults['dph'] + " %";
+    el.querySelector('.produktPouzeDph').innerText = calc.produktPouzeDph(price);
+    el.querySelector('.produktCelkem').innerText = calc.produktCelkem(price,quantity);
+
+  });
+ };
+
+ init();
+})();
+
+</script>
+</body>
+</html>

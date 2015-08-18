@@ -1,0 +1,173 @@
+<script>
+console.log("e");
+console.log({{ order }});
+
+var getNumberWithDecimals = function(number, element) {
+  var numberWithDecimals = number / 100; // it's working thanks to having already only 2 decimal places
+
+  var priceSpan = document.getElementsByClassName(element);
+  for (var i = priceSpan.length - 1; i >= 0; i--) {
+    priceSpan[i].innerHTML = numberWithDecimals + ' Kč';
+  };
+
+    // var shippingPriceSpan = document.getElementById('shipping-price-with-decimals');
+    // shippingPriceSpan.innerHTML = numberWithDecimals + ' Kč';
+
+    //new year
+};
+
+</script>
+
+<div style="float: left; margin: 0 0 1.5em 0; width: 100%;" >
+  <strong style="font-size: 1.5em;">Faktura EM{{ date | date: "%Y" }}<span class='rada'></span></strong><br /><br />
+  <div style="float: left; width: 45%;">
+    Dodavatel: <br />
+    <b>Šafy production s.r.o.</b><br /><br />
+    {{ shop.address }}<br/>
+    {{ shop.city }} {{ shop.province_code }} {{ shop.zip | upcase }}<br/>
+    Česká republika
+    <br /><br />
+    IČO: 24769444
+    DIČ: CZ24769444 <br />
+    <p style="font-size: 11px">ZAPSÁNO U MĚSTSKÉHO SOUDU V PRAZE, ODDÍL C, VLOŽKA 172829.</p><br />
+    E-mail: {{ shop.email }}<br />
+    Web: {{ shop.domain }}<br /><br />
+    <b>Číslo účtu: 107-7564310217/0100</b><br /> <br />
+
+    Forma úhrady: {{ gateways }} <br />
+    Variabilní symbol: {{ date | date: "%Y" }}{{ order_number }}<br /><br />
+    <span style="font-size: 80%">
+    Datum vystavení: {{ created_at | date: "%d. %m. %y" }}<br />
+    Datum splatnosti: {{ date | date: "%d. %m. %y" }}<br />
+    {% for transaction in transactions limit:1 %}
+        Datum zdanitelného plnění: {{ transaction.date | date: "%d. %m. %y" }} <br />
+    {% endfor %}
+    </span>
+  </div>
+  <div style="float: right; width: 45%">
+
+      <h3 style="margin: 0 0 1em 0;">Odběratel:</h3>
+
+      <div style="margin: 0 0 1em 0; padding: 1em; border: 1px solid black;">
+        <strong>{{ billing_address.name }}</strong><br/>
+        {% if billing_address.company %}
+          {{ billing_address.company }}<br/>
+        {% endif %}
+        {{ billing_address.street }}<br/>
+        {{ billing_address.city }}
+        {{ billing_address.province_code }}
+        {{ billing_address.zip | upcase }}<br/>
+        {{ billing_address.country }}
+        <ul>
+        {% for attribute in attributes %}
+         <li style="margin: 0px; list-style-type: none;"> {{ attribute | first | replace: '-', ' ' |  replace: '_', ' ' | replace: 'den', 'Narození: Den' | replace: 'mesic', 'Měsíc' | replace: 'rok', 'Rok' | replace: 'ico', 'IČO' | replace: 'dic', 'DIČ' }} : {{ attribute | last }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+
+  </div>
+</div>
+
+<hr />
+
+<!--<h3 style="margin: 0 0 1em 0;">Objednávka</h3> -->
+<p style='font-size: 11px;'>Čislo objednávky: <span class="order-number">{{ order_number }}</span></p>
+<table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+  <thead>
+    <tr>
+      <th align="left" style="text-align: left">Množství</th>
+      <th>Označení dodávky</th>
+
+      <th align="right" style="width: 95px; text-align: right">Cena bez DPH</th>
+      <th align="right" style="text-align: right">%DPH</th>
+      <th align="right" style="text-align: right">DPH</th>
+      <th align="right" style="text-align: right">Celkem</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for line_item in line_items %}
+      <tr>
+        <td>{{ line_item.quantity }} x</td>
+        <td><b>{{ line_item.title }}</b></td>
+        <td align="right" style="text-align: right">
+            <span class="{{ line_item.price }}"></span>
+            <script>
+                getNumberWithDecimals( {{ line_item.price }}, '{{ line_item.price }}');
+            </script>
+        </td>
+        <td align="right" style="text-align: right">21%</td>
+        <td align="right" style="text-align: right">
+            <span class="tax-{{ line_item.price }}"></span>
+            <script>
+                getNumberWithDecimals( Math.round({{ line_item.price | times: 1.21 | minus: line_item.price }}), 'tax-{{ line_item.price }}');
+            </script>
+        </td>
+        <td align="right" style="text-align: right">
+            <span class="celkem-{{ line_item.price }}"></span>
+            <script>
+                getNumberWithDecimals( Math.round({{ line_item.price | times: 1.21 }}), 'celkem-{{ line_item.price }}');
+            </script>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h4 style="margin: 0 0 1em 0;">Detaily k platbě</h4>
+
+<table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+  <tr>
+    <td>Mezisoučet:</td>
+    <td align="right" style="text-align: right"><span class="subtotal-price-with-decimals"></span></td>
+  </tr>
+  {% for discount in discounts %}
+  <tr>
+    <td>Sleva "{{ discount.code }}"</td>
+    <td align="right" style="text-align: right"><span class="discount-price-with-decimals"> </span>{{ discount.savings | money }}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td>DPH:</td>
+    <td align="right" style="text-align: right"><span class="tax-price-with-decimals"> </span></td>
+
+  </tr>
+  {% if shipping_address %}
+    <tr>
+      <td>Doprava:</td>
+      <td align="right" style="text-align: right"><span class="shipping-price-with-decimals"></span></td>
+    </tr>
+  {% endif %}
+  <tr>
+    <td>Zaokrouhlení:</td>
+    <td align="right" style="text-align: right">
+        <span class="halirove-vyrovnani"></span>
+        <script>
+            var celkovaCena = {{ total_price }} / 100;
+            var celkovaCenaZaokrouhlena = Math.round(celkovaCena);
+            var haliroveVyrovnani = Math.round( (celkovaCenaZaokrouhlena - celkovaCena) * 100) / 100;
+
+            document.getElementsByClassName('halirove-vyrovnani')[0].innerHTML = haliroveVyrovnani + ' Kč';
+        </script>
+    </td>
+
+    <tr>
+      <td><strong>CELKEM K ÚHRADĚ:</strong></td>
+      <td align="right" style="text-align: right"><strong>{{ total_price | money }}</strong></td>
+    </tr>
+</table>
+<p style="font-size: 10px">Zákazník souhlasí s tím , že zboží je určeno pouze pro konečnou spotřebu a není určeno k dalšímu prodeji.</p>
+<p style="font-size: 10px">V případě nejasností nebo dotazů nám pošlete email na <u>{{ shop.email }}</u></p>
+<script>
+  getNumberWithDecimals( {{ tax_price }} , 'tax-price-with-decimals' );
+  getNumberWithDecimals( {{ shipping_price }} , 'shipping-price-with-decimals' );
+  getNumberWithDecimals( {{ subtotal_price }} , 'subtotal-price-with-decimals' );
+
+  var els = document.getElementsByClassName('rada');
+  var numbers = document.getElementsByClassName('order-number');
+  for (var i = 0; i < els.length; i++) {
+    var str = parseInt(numbers[i].innerHTML) - 1749 + '';
+    var pad = "00000";
+    var newsum = pad.substring(0, pad.length - str.length) + str;
+    els[i].innerHTML = newsum;
+  };
+</script>

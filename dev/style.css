@@ -1,0 +1,86 @@
+.box-modal {
+  margin-top: 50px;
+  width: 800px;
+  min-height: 600px;
+  display: block;
+  z-index: 999999999;
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  margin-left: -430px;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 20px 30px;
+}
+.bcg-modal{
+  content: "";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255,255,255, .8);
+  z-index: 99999;
+}
+.close-modal {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 17px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.btn {
+  padding: 0 20px;
+  outline: 0;
+}
+.btn-primary {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px !important;
+  background-color: #479ccf !important;
+  border: 1px solid #2f82b4 !important;
+  color: white;
+  padding: 0 9px !important;
+}
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:hover {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px !important;
+  background-color: #2a74a0 !important;
+  border: 1px solid #2f82b4 !important;
+  color: white;
+  padding: 0 9px !important;
+
+}
+.btn:disabled {
+  opacity: .4;
+}
+
+.hidden {
+  visibility: hidden;
+  height: 0px;
+  width: 0px;
+  opacity: 0;
+}
+.visibile {
+  visibility: visible;
+  height: auto;
+  width: auto;
+  opacity: 1;
+}
+.printer-preview-top {
+  min-height: 38px;
+}
+.heading.printer-template-name {
+  float: left;
+  line-height: 34px;
+  font-size: 15px;
+}
+.printer-template-actions button {
+  float: right;
+}
