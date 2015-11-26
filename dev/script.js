@@ -10,7 +10,7 @@ var ShopifyCustomInvoice = (function(){
 
     var defaults = {
       dph:  0.21,
-      dphzceny: 17.355,
+      koeficient: 17.355,
       mena: "Kč",
     };
 
@@ -48,7 +48,7 @@ var ShopifyCustomInvoice = (function(){
       quantity = Number(el.getAttribute('data-quantity'));
 
       var cenaZaKus = price;
-      var dph = ((price * quantity * params['dphzceny']) / 100).toFixed(2);
+      var dph = ((price * quantity * params['koeficient']) / 100).toFixed(2);
       var celkemBezDph = (cenaZaKus * quantity) - dph;
       var celkemSDph = (price * quantity).toFixed(2);
 
@@ -91,7 +91,7 @@ var ShopifyCustomInvoice = (function(){
     var celkemSDph = invoice['celkem'] + invoice['sleva']  - invoice['doprava'];
 
     //dan
-    invoice['dan'] = Math.round(celkemSDph * params['dphzceny']) / 100;
+    invoice['dan'] = Math.round(celkemSDph * params['koeficient']) / 100;
 
     //celkem bez dane
     invoice['celkemBezDph'] = celkemSDph - invoice['dan'];
@@ -113,7 +113,7 @@ var ShopifyCustomInvoice = (function(){
 //
 ShopifyCustomInvoice({
   dph: 0.21,
-  dphzceny: 17.355,
+  koeficient: 17.355,
   mena: "Kč"
 });
 ////////////////////
