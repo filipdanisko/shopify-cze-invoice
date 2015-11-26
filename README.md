@@ -7,5 +7,5 @@
 
 ##Použití
 1. Vytvořte novou šablonu v pluginu order printer.
-2. Vložte tuto templátu.
+2. Vložte tuto templátu. ze složky Invoice
 3. Upravte vše dle vašich přání.
