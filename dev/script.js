@@ -35,8 +35,6 @@ var ShopifyCustomInvoice = (function(){
     mena =  " " + params['mena'],
 
 
-    console.log(finalParams);
-
     calculateProducts();
     calculateInvoice();
   },
