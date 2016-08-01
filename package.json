@@ -1,7 +1,7 @@
 {
   "name": "Shopify-invoice",
   "description": "",
-  "author": "Filip@ents.co",
+  "author": "filip@ents.co",
   "dependencies": {},
   "devDependencies": {
     "browser-sync": "^2.8.2",
