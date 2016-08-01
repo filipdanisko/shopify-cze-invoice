@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="faktura">
+ <div style="float: left; margin: 0 0 1.5em 0; width: 100%;" >
+  <strong id="opravna-faktura" style="font-size: 1.5em;">Faktura {{ order_number }} </strong><br /><br />
+  <div style="float: left; width: 45%;">
+    Supplier: <br />
+    <strong style="font-size: 2em;">{{shop.name}}</strong><br /><br />
+    {{ shop.address }}<br/>
+    {{ shop.city }} {{ shop.province_code }} {{ shop.zip | upcase }}<br/>
+    {{ shop.country }}<br/>
+    <br /><br />
+    TIN: [[XXX]]
+    VAT: [[XXX]] <br />
+    E-mail: {{ shop.email }}<br />
+    Web: {{ shop.domain }}<br /><br />
+    <b>Bank account: [[ XXX ]]</b><br /> <br />
+
+    Payment method: {{ gateway }} <br />
+    Payment identifier: {{ order_number }}<br /><br />
+    <span style="font-size: 80%">
+    Created at: {{ created_at | date: "%d. %m. %y" }}<br />
+    Due date: {{ date | date: "%d. %m. %y" }}<br />
+    {% for transaction in transactions limit:1 %}
+      Date of taxable supply: {{ transaction.date | date: "%d. %m. %y" }} <br />
+    {% endfor %}
+    </span>
+  </div>
+  <div style="float: right; width: 45%">
+      <h3 style="margin: 0 0 1em 0;">Customer:</h3>
+      <div style="margin: 0 0 1em 0; padding: 1em; border: 1px solid black;">
+        <strong>{{ billing_address.name }}</strong><br/>
+        {% if billing_address.company %}
+          {{ billing_address.company }}<br/>
+        {% endif %}
+        {{ billing_address.street }}<br/>
+        {{ billing_address.city }}
+        {{ billing_address.province_code }}
+        {{ billing_address.zip | upcase }}<br/>
+        {{ billing_address.country }}
+      </div>
+  </div>
+ </div>
+
+  <hr />
+<!-- Produkty -->
+  <table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+    <thead>
+      <tr>
+        <th align="left" style="text-align: left">Quantity</th>
+        <th>Product</th>
+        <th align="right" style="text-align: right">Price per piece</th>
+        <th align="right" style="text-align: right">Tax</th>
+        <th align="right" style="text-align: right">Tax</th>
+        <th align="right" style="text-align: right">Total with Tax</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line_item in line_items %}
+        <tr class="produkt"
+            data-price="{{ line_item.price }}"
+            data-quantity="{{ line_item.quantity }}">
+          <td>{{ line_item.quantity }} x</td>
+          <td><b>{{ line_item.title }}</b></td>
+          <td align="right" style="text-align: right">
+            <span class="result-span produkt-cena-za-kus"></span>
+          </td>
+          <td align="right" style="text-align: right">
+            <span class="produktDph"></span>
+          </td>
+          <td align="right" style="text-align: right">
+            <span class="result-span produkt-celkem-dph"></span>
+          </td>
+          <td align="right" style="text-align: right">
+            <span class="result-span produkt-celkem-s-dph"></span>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+<!-- Produkty -->
+
+<!-- Platba -->
+  <h4 style="margin: 0 0 1em 0;">Information about payment</h4>
+
+  <table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
+    <tr>
+      <td>Total without tax:</td>
+      <td align="right" style="text-align: right"><span class="result-span invoiceCelkemBezDph"></span></td>
+    </tr>
+    {% for discount in discounts %}
+    <tr>
+      <td>Discount "{{ discount.code }}"</td>
+      <td align="right" style="text-align: right">
+        <span class="result-span discount-price-with-decimals" data-sale="{{ discount.savings | money }}"></span>{{ discount.savings | money }}
+      </td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td>Tax:</td>
+      <td align="right" style="text-align: right"><span class="result-span invoiceDph"> </span></td>
+    </tr>
+    {% if shipping_address %}
+    <tr>
+      <td>Shipping:</td>
+      <td align="right" style="text-align: right"><span class="result-span shipping-price-with-decimals" data-shipping='{{ shipping_price }}'>{{ shipping_price | money }}</span></td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td>Rounded:</td>
+      <td align="right" style="text-align: right">
+          <span class="result-span invoiceHalere"></span>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>TOTAL:</strong></td>
+      <td align="right" style="text-align: right"><strong><span data-cc='{{ total_price }}' class="result-span invoiceCelkem">{{ total_price | money }}</span></strong></td>
+    </tr>
+  </table>
+<!-- Platba -->
+  <p style="font-size: 10px">If you have any issue contact us on email <u>{{ shop.email }}</u></p>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -49,6 +49,15 @@ gulp.task('build', function() {
     }))
     .pipe(rename('invoice.html'))
     .pipe(gulp.dest('invoice/'))
+
+  gulp.src('dev/invoiceENG.liquid')
+    .pipe(inline({
+      base: 'dev/',
+      css: minifyCss(),
+      disabledTypes: ['svg', 'img'] // Only inline css files
+    }))
+    .pipe(rename('invoiceENG.html'))
+    .pipe(gulp.dest('invoice/'))
 });
 
 
@@ -58,14 +67,3 @@ gulp.task('default', ['browser-sync', 'dev', 'build'], function () {
   gulp.watch('./**/*.js',     ['dev', 'build']);
   gulp.watch('./**/*.liquid', ['dev', 'build']);
 });
-
-
-
-
-
-
-
-
-
-
-
