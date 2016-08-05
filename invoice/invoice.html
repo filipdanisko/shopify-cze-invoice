@@ -32,7 +32,7 @@
     Datum vystavení: <span class="datum-vystaveni">{{ created_at | date: "%d. %m. %y" }}</span><br>
     Datum splatnosti: <span class="datum-splatnosti">{{ date | date: "%d. %m. %y" }}</span><br>
     {% for transaction in transactions limit:1 %}
-        Datum zdanitelného plnění: {{ transaction.date | date: "%d. %m. %y" }} <br>
+        <span class="datum-splatnosti">Datum zdanitelného plnění: {{ transaction.date | date: "%d. %m. %y" }}</span><br>
     {% endfor %}
     </span>
   </div>
