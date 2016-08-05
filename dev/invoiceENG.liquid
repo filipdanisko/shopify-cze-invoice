@@ -26,8 +26,8 @@
     Payment method: {{ gateway }} <br />
     Payment identifier: {{ order_number }}<br /><br />
     <span style="font-size: 80%">
-    Created at: {{ created_at | date: "%d. %m. %y" }}<br />
-    Due date: {{ date | date: "%d. %m. %y" }}<br />
+    Created at: <span class="datum-vystaveni">{{ created_at | date: "%d. %m. %y" }}</span><br />
+    Due date: <span class="datum-splatnosti">{{ date | date: "%d. %m. %y" }}</span><br />
     {% for transaction in transactions limit:1 %}
       Date of taxable supply: {{ transaction.date | date: "%d. %m. %y" }} <br />
     {% endfor %}

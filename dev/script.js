@@ -12,6 +12,7 @@ var ShopifyCustomInvoice = (function(){
       dph:  0.21,
       koeficient: 17.355,
       mena: "Kč",
+      datumSplatnosti: 0,
     };
 
 
@@ -32,9 +33,9 @@ var ShopifyCustomInvoice = (function(){
     params = finalParams;
 
     // Set Mena
-    mena =  " " + params['mena'],
+    mena =  " " + params['mena'];
 
-
+    formatDates();
     calculateProducts();
     calculateInvoice();
   },
@@ -99,6 +100,36 @@ var ShopifyCustomInvoice = (function(){
     document.querySelector('.invoiceDph').innerText = invoice['dan'] + mena;
     document.querySelector('.invoiceHalere').innerText = invoice['halere'] + mena;
     document.querySelector('.invoiceCelkem').innerText = invoice['celkem'] + mena;
+  },
+
+  formatDates = function() {
+    var dateEl = document.querySelector('.datum-splatnosti');
+    var dateCreate = document.querySelector('.datum-vystaveni');
+    dateCreate.innerHTML = formatDate(dateCreate.innerText);
+    dateEl.innerHTML = formatDate(addDays(dateEl.innerText, params['datumSplatnosti']));
+  },
+
+  addDays = function(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  },
+
+  formatDate = function(date) {
+    var result = new Date(date);
+    var dd = result.getDate();
+    var mm = result.getMonth()+1; //January is 0!
+
+    var yyyy = result.getFullYear();
+    if(dd<10){
+        dd='0'+dd
+    }
+    if(mm<10){
+        mm='0'+mm
+    }
+    var result = dd+'. '+mm+'. '+yyyy;
+
+    return result;
   };
 
   return init;
@@ -112,6 +143,7 @@ var ShopifyCustomInvoice = (function(){
 ShopifyCustomInvoice({
   dph: 0.21,
   koeficient: 17.355,
-  mena: "Kč"
+  mena: "Kč",
+  datumSplatnosti: 0
 });
 ////////////////////

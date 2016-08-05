@@ -27,8 +27,8 @@
     Forma úhrady: {{ gateway }} <br />
     Variabilní symbol: {{ order_number }}<br /><br />
     <span style="font-size: 80%">
-    Datum vystavení: {{ created_at | date: "%d. %m. %y" }}<br />
-    Datum splatnosti: {{ date | date: "%d. %m. %y" }}<br />
+    Datum vystavení: <span class="datum-vystaveni">{{ created_at | date: "%d. %m. %y" }}</span><br />
+    Datum splatnosti: <span class="datum-splatnosti">{{ date | date: "%d. %m. %y" }}</span><br />
     {% for transaction in transactions limit:1 %}
         Datum zdanitelného plnění: {{ transaction.date | date: "%d. %m. %y" }} <br />
     {% endfor %}
