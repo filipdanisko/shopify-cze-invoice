@@ -105,13 +105,20 @@ var ShopifyCustomInvoice = (function(){
   formatDates = function() {
     var dateEl = document.querySelector('.datum-splatnosti');
     var dateCreate = document.querySelector('.datum-vystaveni');
-    dateCreate.innerHTML = formatDate(dateCreate.innerText);
+    dateCreate.innerHTML = formatDate(addDays(dateCreate.innerText,0));
     dateEl.innerHTML = formatDate(addDays(dateEl.innerText, params['datumSplatnosti']));
   },
 
   addDays = function(date, days) {
-    var result = new Date(date);
+    var parts = date.split(". ");
+    var str = (parts[1])+","+ parts[0]+","+ parts[2];
+    var result = new Date(str);
+    console.log(str);
+    console.log(result);
+    console.log(parts[1], parts[0], parts[2]);
+    console.log(result.getDate() + days);
     result.setDate(result.getDate() + days);
+
     return result;
   },
 
