@@ -138,12 +138,10 @@ var ShopifyCustomInvoice = (function(){
   },
   mena = '',
 
-
   init = function(paramObject) {
 
     var defaults = {
       dph:  0.21,
-      koeficient: 21,
       mena: "Kč",
       datumSplatnosti: 0,
     };
@@ -180,9 +178,9 @@ var ShopifyCustomInvoice = (function(){
       quantity = Number(el.getAttribute('data-quantity'));
 
       var cenaZaKus = price;
-      var dph = ((price * quantity * params['koeficient']) / 100).toFixed(2);
+      var dph = calculateTaxFromFullPrice(price * quantity);
       var celkemBezDph = (cenaZaKus * quantity) - dph;
-      var celkemSDph = (price * quantity).toFixed(2);
+      var celkemSDph = roundToTwo(price * quantity);
 
       el.querySelector('.produkt-cena-za-kus').innerText = cenaZaKus + mena;
       el.querySelector('.produktDph').innerText = params['dph'] * 100 + " %";
@@ -210,7 +208,7 @@ var ShopifyCustomInvoice = (function(){
 
     //halere
     var celkovaCenaZaokrouhlena = Math.round(invoice['celkem']);
-    invoice['halere'] = Math.round( (celkovaCenaZaokrouhlena - invoice['celkem']) * 100) / 100;
+    invoice['halere'] = roundToTwo( (celkovaCenaZaokrouhlena - invoice['celkem']) * 100) / 100;
 
     //Sleva
     var slevaEl = document.querySelector('.discount-price-with-decimals') || null;
@@ -220,10 +218,10 @@ var ShopifyCustomInvoice = (function(){
     invoice['doprava'] = document.querySelector('.shipping-price-with-decimals').getAttribute('data-shipping') / 100;
 
     //celekme s dani
-    var celkemSDph = invoice['celkem'] - invoice['sleva']  - invoice['doprava'];
+    var celkemSDph = invoice['celkem'] - invoice['doprava'];
 
     //dan
-    invoice['dan'] = Math.round(celkemSDph * params['koeficient']) / 100;
+    invoice['dan'] = calculateTaxFromFullPrice(celkemSDph);
 
     //celkem bez dane
     invoice['celkemBezDph'] = celkemSDph - invoice['dan'];
@@ -235,6 +233,11 @@ var ShopifyCustomInvoice = (function(){
     document.querySelector('.invoiceCelkem').innerText = invoice['celkem'] + mena;
   },
 
+  calculateTaxFromFullPrice = function(fullPrice) {
+    var baseOfTax = fullPrice * 100 / (params['dph'] * 100 + 100);
+    return roundToTwo(fullPrice - baseOfTax);
+  },
+
   formatDates = function() {
     var dateEl = document.querySelector('.datum-splatnosti');
     var dateCreate = document.querySelector('.datum-vystaveni');
@@ -243,9 +246,10 @@ var ShopifyCustomInvoice = (function(){
   },
 
   addDays = function(date, days) {
+    console.log(date,days);
     var parts = date.split(". ");
     var str = (parts[1])+","+ parts[0]+","+ parts[2];
-    var result = new Date(str);
+    var result = new Date(parts[1], parts[0], parts[2]);
     result.setDate(result.getDate() + days);
 
     return result;
@@ -266,6 +270,10 @@ var ShopifyCustomInvoice = (function(){
     var result = dd+'. '+mm+'. '+yyyy;
 
     return result;
+  },
+
+  roundToTwo = function(num) {
+    return +(Math.round(num + "e+2")  + "e-2");
   };
 
   return init;
@@ -278,7 +286,6 @@ var ShopifyCustomInvoice = (function(){
 //
 ShopifyCustomInvoice({
   dph: 0.21,
-  koeficient: 21,
   mena: "Kč",
   datumSplatnosti: 0
 });

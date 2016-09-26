@@ -23,21 +23,21 @@ var shopify = {
   transaction: {
     date: function(){ return new Date().toJSON().slice(0,10) }
   },
-  shipping_price: 2000,
+  shipping_price: 0,
   line_items: {
     0: {
-      title: "Toustovač",
-      quantity: 2,
-      price: 10000,
+      title: "Kufr",
+      quantity: 1,
+      price: 156000,
     }
   },
-  discounts: {
-    0: {
-      code: 123456,
-      savings: 50
-    }
-  },
-  total_price: 17000
+  // discounts: {
+  //   0: {
+  //     code: 123456,
+  //     savings: 50
+  //   }
+  // },
+  total_price: 156000
 };
 
 

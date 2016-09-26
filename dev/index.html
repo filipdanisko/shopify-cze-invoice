@@ -61,9 +61,9 @@
       </tr>
     </thead>
     <tbody>
-        <tr class="produkt" data-price="10000" data-quantity="2">
-          <td>2 x</td>
-          <td><b>Toustovač</b></td>
+        <tr class="produkt" data-price="156000" data-quantity="1">
+          <td>1 x</td>
+          <td><b>Kufr</b></td>
           <td align="right" style="text-align: right">
             <span class="result-span produkt-cena-za-kus"></span>
           </td>
@@ -90,18 +90,12 @@
       <td align="right" style="text-align: right"><span class="result-span invoiceCelkemBezDph"></span></td>
     </tr>
     <tr>
-      <td>Sleva "123456"</td>
-      <td align="right" style="text-align: right">
-        <span class="result-span discount-price-with-decimals" data-sale="50"></span>50
-      </td>
-    </tr>
-    <tr>
       <td>DPH:</td>
       <td align="right" style="text-align: right"><span class="result-span invoiceDph"> </span></td>
     </tr>
     <tr>
       <td>Doprava:</td>
-      <td align="right" style="text-align: right"><span class="result-span shipping-price-with-decimals" data-shipping="2000">2000</span></td>
+      <td align="right" style="text-align: right"><span class="result-span shipping-price-with-decimals" data-shipping="0">0</span></td>
     </tr>
     <tr>
       <td>Zaokrouhlení:</td>
@@ -111,7 +105,7 @@
     </tr>
     <tr>
       <td><strong>CELKEM K ÚHRADĚ:</strong></td>
-      <td align="right" style="text-align: right"><strong><span data-cc="17000" class="result-span invoiceCelkem">17000</span></strong></td>
+      <td align="right" style="text-align: right"><strong><span data-cc="156000" class="result-span invoiceCelkem">156000</span></strong></td>
     </tr>
   </table>
 <!-- Platba -->
@@ -127,12 +121,10 @@ var ShopifyCustomInvoice = (function(){
   },
   mena = '',
 
-
   init = function(paramObject) {
 
     var defaults = {
       dph:  0.21,
-      koeficient: 21,
       mena: "Kč",
       datumSplatnosti: 0,
     };
@@ -169,9 +161,9 @@ var ShopifyCustomInvoice = (function(){
       quantity = Number(el.getAttribute('data-quantity'));
 
       var cenaZaKus = price;
-      var dph = ((price * quantity * params['koeficient']) / 100).toFixed(2);
+      var dph = calculateTaxFromFullPrice(price * quantity);
       var celkemBezDph = (cenaZaKus * quantity) - dph;
-      var celkemSDph = (price * quantity).toFixed(2);
+      var celkemSDph = roundToTwo(price * quantity);
 
       el.querySelector('.produkt-cena-za-kus').innerText = cenaZaKus + mena;
       el.querySelector('.produktDph').innerText = params['dph'] * 100 + " %";
@@ -199,7 +191,7 @@ var ShopifyCustomInvoice = (function(){
 
     //halere
     var celkovaCenaZaokrouhlena = Math.round(invoice['celkem']);
-    invoice['halere'] = Math.round( (celkovaCenaZaokrouhlena - invoice['celkem']) * 100) / 100;
+    invoice['halere'] = roundToTwo( (celkovaCenaZaokrouhlena - invoice['celkem']) * 100) / 100;
 
     //Sleva
     var slevaEl = document.querySelector('.discount-price-with-decimals') || null;
@@ -209,10 +201,10 @@ var ShopifyCustomInvoice = (function(){
     invoice['doprava'] = document.querySelector('.shipping-price-with-decimals').getAttribute('data-shipping') / 100;
 
     //celekme s dani
-    var celkemSDph = invoice['celkem'] - invoice['sleva']  - invoice['doprava'];
+    var celkemSDph = invoice['celkem'] - invoice['doprava'];
 
     //dan
-    invoice['dan'] = Math.round(celkemSDph * params['koeficient']) / 100;
+    invoice['dan'] = calculateTaxFromFullPrice(celkemSDph);
 
     //celkem bez dane
     invoice['celkemBezDph'] = celkemSDph - invoice['dan'];
@@ -224,6 +216,11 @@ var ShopifyCustomInvoice = (function(){
     document.querySelector('.invoiceCelkem').innerText = invoice['celkem'] + mena;
   },
 
+  calculateTaxFromFullPrice = function(fullPrice) {
+    var baseOfTax = fullPrice * 100 / (params['dph'] * 100 + 100);
+    return roundToTwo(fullPrice - baseOfTax);
+  },
+
   formatDates = function() {
     var dateEl = document.querySelector('.datum-splatnosti');
     var dateCreate = document.querySelector('.datum-vystaveni');
@@ -232,9 +229,10 @@ var ShopifyCustomInvoice = (function(){
   },
 
   addDays = function(date, days) {
+    console.log(date,days);
     var parts = date.split(". ");
     var str = (parts[1])+","+ parts[0]+","+ parts[2];
-    var result = new Date(str);
+    var result = new Date(parts[1], parts[0], parts[2]);
     result.setDate(result.getDate() + days);
 
     return result;
@@ -255,6 +253,10 @@ var ShopifyCustomInvoice = (function(){
     var result = dd+'. '+mm+'. '+yyyy;
 
     return result;
+  },
+
+  roundToTwo = function(num) {
+    return +(Math.round(num + "e+2")  + "e-2");
   };
 
   return init;
@@ -267,7 +269,6 @@ var ShopifyCustomInvoice = (function(){
 //
 ShopifyCustomInvoice({
   dph: 0.21,
-  koeficient: 21,
   mena: "Kč",
   datumSplatnosti: 0
 });
