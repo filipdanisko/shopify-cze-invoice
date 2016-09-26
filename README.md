@@ -4,7 +4,6 @@
 ```js
 ShopifyCustomInvoice({
   dph: 0.21,
-  koeficient: 21,
   mena: "Kč",
   datumSplatnosti: 0
 });
