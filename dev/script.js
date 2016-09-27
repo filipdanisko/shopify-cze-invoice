@@ -85,13 +85,13 @@ var ShopifyCustomInvoice = (function(){
     invoice['doprava'] = document.querySelector('.shipping-price-with-decimals').getAttribute('data-shipping') / 100;
 
     //celekme s dani
-    var celkemSDph = invoice['celkem'] - invoice['doprava'];
+    //var celkemSDph = invoice['celkem'] - invoice['doprava'];
 
     //dan
-    invoice['dan'] = calculateTaxFromFullPrice(celkemSDph);
+    invoice['dan'] = calculateTaxFromFullPrice(invoice['celkem']);
 
     //celkem bez dane
-    invoice['celkemBezDph'] = celkemSDph - invoice['dan'];
+    invoice['celkemBezDph'] = invoice['celkem'] - invoice['dan'];
 
     //Display
     document.querySelector('.invoiceCelkemBezDph').innerText = invoice['celkemBezDph'] + mena;

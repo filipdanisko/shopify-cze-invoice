@@ -91,10 +91,6 @@
   <h4 style="margin: 0 0 1em 0;">Information about payment</h4>
 
   <table class="table-tabular" style="margin: 0 0 1.5em 0; font-size: 80%;">
-    <tr>
-      <td>Total without tax:</td>
-      <td align="right" style="text-align: right"><span class="result-span invoiceCelkemBezDph"></span></td>
-    </tr>
     {% for discount in discounts %}
     <tr>
       <td>Discount "{{ discount.code }}"</td>
@@ -103,16 +99,20 @@
       </td>
     </tr>
     {% endfor %}
-    <tr>
-      <td>Tax:</td>
-      <td align="right" style="text-align: right"><span class="result-span invoiceDph"> </span></td>
-    </tr>
     {% if shipping_address %}
     <tr>
       <td>Shipping:</td>
       <td align="right" style="text-align: right"><span class="result-span shipping-price-with-decimals" data-shipping="{{ shipping_price }}">{{ shipping_price | money }}</span></td>
     </tr>
     {% endif %}
+    <tr>
+      <td>Tax:</td>
+      <td align="right" style="text-align: right"><span class="result-span invoiceDph"> </span></td>
+    </tr>
+    <tr>
+      <td>Total without tax:</td>
+      <td align="right" style="text-align: right"><span class="result-span invoiceCelkemBezDph"></span></td>
+    </tr>
     <tr>
       <td>Rounded:</td>
       <td align="right" style="text-align: right">
@@ -217,13 +217,13 @@ var ShopifyCustomInvoice = (function(){
     invoice['doprava'] = document.querySelector('.shipping-price-with-decimals').getAttribute('data-shipping') / 100;
 
     //celekme s dani
-    var celkemSDph = invoice['celkem'] - invoice['doprava'];
+    //var celkemSDph = invoice['celkem'] - invoice['doprava'];
 
     //dan
-    invoice['dan'] = calculateTaxFromFullPrice(celkemSDph);
+    invoice['dan'] = calculateTaxFromFullPrice(invoice['celkem']);
 
     //celkem bez dane
-    invoice['celkemBezDph'] = celkemSDph - invoice['dan'];
+    invoice['celkemBezDph'] = invoice['celkem'] - invoice['dan'];
 
     //Display
     document.querySelector('.invoiceCelkemBezDph').innerText = invoice['celkemBezDph'] + mena;
