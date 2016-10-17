@@ -240,15 +240,15 @@ var ShopifyCustomInvoice = (function(){
   formatDates = function() {
     var dateEl = document.querySelector('.datum-splatnosti');
     var dateCreate = document.querySelector('.datum-vystaveni');
-    dateCreate.innerHTML = formatDate(addDays(dateCreate.innerText,0));
+    dateCreate.innerHTML = formatDate(addDays(document.querySelector('.datum-vystaveni').innerText,0));
     dateEl.innerHTML = formatDate(addDays(dateEl.innerText, params['datumSplatnosti']));
   },
 
   addDays = function(date, days) {
-    console.log(date,days);
     var parts = date.split(". ");
     var str = (parts[1])+","+ parts[0]+","+ parts[2];
-    var result = new Date(parts[1], parts[0], parts[2]);
+    var resultt = new Date(parts[1], parts[0], parts[2]);
+    var result = new Date(Date.UTC(parts[2],parts[1]-1,parts[0]));
     result.setDate(result.getDate() + days);
 
     return result;
@@ -261,10 +261,10 @@ var ShopifyCustomInvoice = (function(){
 
     var yyyy = result.getFullYear();
     if(dd<10){
-        dd='0'+dd
+      dd='0'+dd
     }
     if(mm<10){
-        mm='0'+mm
+      mm='0'+mm
     }
     var result = dd+'. '+mm+'. '+yyyy;
 
